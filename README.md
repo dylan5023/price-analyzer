@@ -3,19 +3,37 @@
 Competitor price analysis module for automated pricing review.
 
 ## Problem
+
 Manually comparing competitor prices against internal pricing is slow and
 error-prone. This module calculates price gaps and flags items that require
 human review.
 
 ## Business Rules
-- `price_gap_percent` = (our_price - competitor_price) / competitor_price * 100
-- Items with a gap exceeding 10% are flagged as `review_required`
-- Negative or zero prices are rejected as invalid input
+
+### Analysis
+
+| Rule                | Definition                                                                       |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `price_gap_percent` | `(our_price - competitor_price) / competitor_price * 100`, rounded to 2 decimals |
+| `review_required`   | **Absolute** gap **exceeds** 10% (both directions: too expensive or too cheap)   |
+| `is_outlier`        | **Absolute** gap **exceeds** 50% — likely a data quality issue, not a real price |
+
+### Input Handling
+
+| Rule                             | Behavior                                                       |
+| -------------------------------- | -------------------------------------------------------------- |
+| Duplicate rows                   | Removed before validation                                      |
+| Thousands separator (`1,299.00`) | Normalized to `1299.00`                                        |
+| Whitespace in SKU                | Stripped                                                       |
+| Zero, negative, or missing price | **Rejected** with a reason — never silently dropped or imputed |
+| Non-numeric price (`abc`)        | **Rejected** with a reason — not coerced to NaN                |
 
 ## Status
+
 🚧 In development — Step 1 of 9 (Python module)
 
 ## Tech Stack
+
 Python 3.12 · Pydantic · Pandas · pytest · uv
 
 ## Setup
@@ -39,8 +57,9 @@ data/            # Sample datasets
 ```
 
 ## Roadmap
+
 - [x] Project setup
-- [ ] Price analysis module + tests
+- [x] Pydantic models & domain exceptions
+- [x] CSV loader with normalization
+- [ ] Price analysis pipeline + tests
 - [ ] FastAPI endpoint
-- [ ] Docker
-- [ ] n8n workflow integration
