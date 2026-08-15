@@ -3,8 +3,8 @@ from pydantic import BaseModel, Field, ConfigDict
 class PriceInput(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
     sku: str = Field(min_length=1)
-    our_price: float = Field(gt=0)
-    competitor_price: float = Field(gt=0)
+    our_price: float = Field(gt=0, allow_inf_nan=False)
+    competitor_price: float = Field(gt=0, allow_inf_nan=False)
 
 class PriceResult(BaseModel):
     sku: str
