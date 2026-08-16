@@ -1,9 +1,9 @@
 from src.models import PriceInput, PriceResult
 from pydantic import ValidationError
 from src.exceptions import InvalidPriceError, PriceAnalyzerError
+from src.config import settings 
 
-REVIEW_THRESHOLD_PERCENT = 10.0
-OUTLIER_THRESHOLD_PERCENT = 50.0
+
 
 def analyze(price_input: PriceInput) -> PriceResult:
     """Calculate the price gap and determine whether review is required."""
@@ -13,8 +13,8 @@ def analyze(price_input: PriceInput) -> PriceResult:
     gap = round((our - competitor) / competitor * 100, 2)
 
 
-    review_required = abs(gap) > REVIEW_THRESHOLD_PERCENT
-    is_outlier = abs(gap) > OUTLIER_THRESHOLD_PERCENT
+    review_required = abs(gap) > settings.review_threshold_percent
+    is_outlier = abs(gap) > settings.outlier_threshold_percent
 
     return PriceResult(
         sku = price_input.sku,

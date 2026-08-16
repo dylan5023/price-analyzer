@@ -28,6 +28,22 @@ human review.
 | Zero, negative, or missing price | **Rejected** with a reason — never silently dropped or imputed |
 | Non-numeric price (`abc`)        | **Rejected** with a reason — not coerced to NaN                |
 
+## Configuration
+
+All settings are read from environment variables (see `.env.example`).
+Values are validated at startup — invalid configuration fails fast.
+
+| Variable                    | Default | Description                                                |
+| --------------------------- | ------- | ---------------------------------------------------------- |
+| `REVIEW_THRESHOLD_PERCENT`  | `10.0`  | Gap above which an item is flagged for review              |
+| `OUTLIER_THRESHOLD_PERCENT` | `50.0`  | Gap above which an item is treated as a data quality issue |
+| `REQUEST_TIMEOUT_SECONDS`   | `10`    | HTTP request timeout                                       |
+| `MAX_ATTEMPTS`              | `3`     | Max attempts for retryable failures (5xx, 429, network)    |
+| `BACKOFF_BASE_SECONDS`      | `1.0`   | Base for exponential backoff                               |
+
+Retryable status codes are intentionally **not** configurable — they follow
+the HTTP spec rather than local policy.
+
 ## Status
 
 🚧 In development — Step 1 of 9 (Python module)

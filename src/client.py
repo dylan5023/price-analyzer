@@ -3,22 +3,24 @@
 import time 
 import requests
 from src.exceptions import DataSourceError
+from src.config import settings 
 
-DEFAULT_TIMEOUT_SECONDS = 10
-MAX_ATTEMPTS = 3
-BACKOFF_BASE_SECONDS = 1
+
 RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 
-def fetch_price(url: str, timeout: int = DEFAULT_TIMEOUT_SECONDS) -> dict:
+def fetch_price(url: str, timeout: int | None) -> dict:
     """Fetch price data from an external API.
 
     Retries on transient failures (5xx, 429, network errors) with
     exponential backoff. Client errors (4xx) fail immediately.
     """
+    
+    if timeout is None:
+        timeout = settings.request_timeout_seconds
 
     last_error: Exception | None = None 
 
-    for attempt in range(1, MAX_ATTEMPTS +1):
+    for attempt in range(1, settings.max_attempts +1):
         try:
             response = requests.get(url, timeout=timeout)
         except (requests.Timeout, requests.ConnectionError) as e:
@@ -37,9 +39,9 @@ def fetch_price(url: str, timeout: int = DEFAULT_TIMEOUT_SECONDS) -> dict:
                 f"status {response.status_code}"
             )
 
-        if attempt < MAX_ATTEMPTS:
-            time.sleep(BACKOFF_BASE_SECONDS * (2 ** (attempt - 1)))
+        if attempt < settings.max_attempts:
+            time.sleep(settings.backoff_base_seconds * (2 ** (attempt - 1)))
     
     raise DataSourceError(
-        f"Failed after {MAX_ATTEMPTS} attempts: {url}"
+        f"Failed after {settings.max_attempts} attempts: {url}"
     ) from last_error
