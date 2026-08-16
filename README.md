@@ -59,6 +59,11 @@ uv sync
 uv run pytest
 ```
 
+## Tests
+
+6 tests covering: gap calculation, zero-gap, the 10% boundary,
+invalid input rejection at both the model and the analyzer boundary.
+
 ## Project Structure
 
 ```
@@ -77,5 +82,5 @@ data/            # Sample datasets
 - [x] Project setup
 - [x] Pydantic models & domain exceptions
 - [x] CSV loader with normalization
-- [ ] Price analysis pipeline + tests
+- [x] Price analysis pipeline + tests
 - [ ] FastAPI endpoint
